@@ -1,19 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = 'RGAPI-ff829174-63a9-4f38-a5ba-8158c488596f';
+    const apiKey = 'RGAPI-d99880de-242c-4dc6-8580-fba732d960e5';
     let summonerName;
     const input = document.getElementById('input');
     const submitButton = document.getElementById('btn');
     const errorField = document.getElementById('error');
     const team1 = document.getElementById('team1');
     const team2 = document.getElementById('team2');
+    const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
     const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
     const firstTeamIds = [];
     const secondTeamIds = [];
 
+    regenerateApiKeyButton.addEventListener('click', () => {
+        window.open("https://developer.riotgames.com/");
+    })
+
     submitButton.addEventListener('click', () => {
-        errorField.innerHTML = '';
+        errorField.innerHTML = ''
+        regenerateApiKeyButton.style.display = "none";
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
         // console.log(summonerName);
@@ -125,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 console.log(resp.status.status_code);
                                 console.log(resp.status)
                                 errorField.style.display = 'block';
+                                regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'Invalid API key';
                                 reject(resp.status.message);
                             } else {

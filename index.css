@@ -10,6 +10,7 @@ div {
 
 #error {
     font-size: 30px;
+    display:none;
 }
 .team {
     margin-top: 10px;
@@ -17,4 +18,9 @@ div {
     border: 1px solid black;
     /* float: center; */
     display:inline-block;
+}
+
+#regenerate-api-key {
+    margin-top: 5px;
+    display:none;
 }
