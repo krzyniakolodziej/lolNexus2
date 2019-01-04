@@ -1,7 +1,20 @@
 body {
     text-align: center;
+    font-family: 'Open Sans', sans-serif;
+}
+
+div {
+    font-weight: 500;
+    font-family: 'Open Sans Condensed', sans-serif;
 }
 
 #error {
     font-size: 30px;
+}
+.team {
+    margin-top: 10px;
+    width: 20%;
+    border: 1px solid black;
+    /* float: center; */
+    display:inline-block;
 }
