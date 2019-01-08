@@ -268,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader2.style.display = "none";
                                 team1.innerHTML = '';
                                 team2.innerHTML = '';
-                                regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'API limit exceeded';
                                 unlockFetch();
                                 reject(resp.status.message);
