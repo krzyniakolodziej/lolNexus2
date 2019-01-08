@@ -20,6 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     submitButton.addEventListener('click', () => {
+        lockFetch();
+        doEverything();
+    });
+    input.addEventListener('keydown', e => {
+        if (e.keyCode === 13) {
+            lockFetch();
+            doEverything();
+        }
+    });
+    function lockFetch() {
+        submitButton.disabled = true;
+        input.disabled = true;
+    }
+    function unlockFetch() {
+        submitButton.disabled = false;
+        input.disabled = false;
+    }
+    function clearFieldsSetLoading() {
         team1.innerHTML = '';
         team1.style.display = "none"
         loader1.style.display = "inline-block";
@@ -28,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loader2.style.display = "inline-block";
         errorField.innerHTML = ''
         regenerateApiKeyButton.style.display = "none";
+    }
+    function doEverything() {
+        clearFieldsSetLoading();
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
         // console.log(summonerName);
@@ -38,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(setPlayerTeams)
             .then(createArrayOfNameLinks)
             .then(getSummonerId)
+
 
         function colorRedSearchedPlayer(name) {
             // console.log(summonerName, 'summ')
@@ -53,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        function setLeagueColor(tier) {
+        function setLeagueColor(tier) { // ask mati or kuba pls <--------------------------------------------------------
             if (tier === 'GOLD') {
 
             }
@@ -61,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function colorTier(tier) {
             if (tier === 'IRON') {
+                return 'color:#7E5307';
+            } else if (tier === 'BRONZE') {
                 return 'color:#7E5307';
             } else if (tier === 'SILVER') {
                 return 'color:#A2A28D';
@@ -150,10 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     getPlayerData(element.link)
                         .then(createFirstArrayOfSummonerIds)
                         .then(getFirstTeamSummonerInfo)
+                        .then(unlockFetch)
                 } else {
                     getPlayerData(element.link)
                         .then(createSecondArrayOfSummonerIds)
                         .then(getSecondTeamSummonerInfo)
+                        .then(unlockFetch)
                 }
             })
             return;
@@ -223,8 +249,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader2.style.display = "none";
                                 regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'Invalid API key';
+                                unlockFetch();
                                 reject(resp.status.message);
-                            } else if (resp.status.status_code === 429) {
+                            } else if (resp.status.status_code === 400) {
+                                console.log(resp.status.status_code);
+                                console.log(resp.status)
+                                errorField.style.display = 'block';
+                                loader1.style.display = "none";
+                                loader2.style.display = "none";
+                                errorField.innerHTML = 'Enter a valid summoner name';
+                                unlockFetch();
+                            }
+                            else if (resp.status.status_code === 429) {
                                 console.log(resp.status.status_code);
                                 console.log(resp.status)
                                 errorField.style.display = 'block';
@@ -234,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 team2.innerHTML = '';
                                 regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'API limit exceeded';
+                                unlockFetch();
                                 reject(resp.status.message);
                             }
                             else {
@@ -243,9 +280,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader1.style.display = "none";
                                 loader2.style.display = "none";
                                 errorField.innerText = `${resp.status.message}`;
+                                unlockFetch();
                                 reject(resp.status.message);
                             }
                         }
+                        unlockFetch();
                         resolve(resp);
                     })
                     .catch(error => {
@@ -254,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
             });
         }
-    })
-
+    }
 });
 
