@@ -38,23 +38,32 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(response[3])
             team1DataElements.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank} ; ${response[2].queueType}: ${response[2].tier} ${response[2].rank}<br>`;
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank} ; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank}<br>`;
             } else if (response[0] && response[1]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank}<br>`;
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}<br>`;
             } else if (response[0]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}<br>`;
             } else if (!response[0]) {
                 team1.innerHTML += `Unranked ${console.log(response)}`
+            }
+        }
+        function displayEasyLeagues(response) {
+            if (response === 'RANKED_SOLO_5x5') {
+                return 'SoloQ'
+            } else if (response === 'RANKED_FLEX_SR') {
+                return 'Flex'
+            } else {
+                return '3v3'
             }
         }
         function pushSecondTeamInfo(response) {
             team2DataElements.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank} ; ${response[2].queueType}: ${response[2].tier} ${response[2].rank}<br>`;
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank} <br>`;
             } else if (response[0] && response[1]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank}<br>`;
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}<br>`;
             } else if (response[0]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}<br>`;
             } else if (!response[0]) {
                 team2.innerHTML += `Unranked ${console.log(response)}`
             }
