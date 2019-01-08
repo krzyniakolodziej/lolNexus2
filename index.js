@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = 'RGAPI-d99880de-242c-4dc6-8580-fba732d960e5';
+    const apiKey = 'RGAPI-ce29fd76-c740-4e18-92d8-421af92d2c3b';
     let summonerName;
     const input = document.getElementById('input');
     const submitButton = document.getElementById('btn');
@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const team1 = document.getElementById('team1');
     const team2 = document.getElementById('team2');
     const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
+    const team1DataElements = document.getElementById('team1');
+    const team2DataElements = document.getElementById('team2');
     const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
@@ -33,11 +35,29 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(getSummonerId)
 
         function pushFirstTeamInfo(response) {
-            team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
-            // document.write('\n');
+            console.log(response[3])
+            team1DataElements.style.display = "block";
+            if (response[0] && response[1] && response[2]) {
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank} ; ${response[2].queueType}: ${response[2].tier} ${response[2].rank}<br>`;
+            } else if (response[0] && response[1]) {
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank}<br>`;
+            } else if (response[0]) {
+                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
+            } else if (!response[0]) {
+                team1.innerHTML += `Unranked ${console.log(response)}`
+            }
         }
         function pushSecondTeamInfo(response) {
-            team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
+            team2DataElements.style.display = "block";
+            if (response[0] && response[1] && response[2]) {
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank} ; ${response[2].queueType}: ${response[2].tier} ${response[2].rank}<br>`;
+            } else if (response[0] && response[1]) {
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank} ; ${response[1].queueType}: ${response[1].tier} ${response[1].rank}<br>`;
+            } else if (response[0]) {
+                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${response[0].queueType}: ${response[0].tier} ${response[0].rank}<br>`;
+            } else if (!response[0]) {
+                team2.innerHTML += `Unranked ${console.log(response)}`
+            }
         }
 
         function getFirstTeamSummonerInfo() {
