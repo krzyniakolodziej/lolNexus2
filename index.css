@@ -14,7 +14,7 @@ div {
 }
 .team {
     margin-top: 10px;
-    width: 35%;
+    width: 25%;
     border: 1px solid black;
     /* float: center; */
     display:inline-block;
@@ -25,9 +25,13 @@ div {
     display:none;
 }
 .team-content {
+    text-align: left;
     border: 1px solid black;
     margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 5px;
     display:none;
+}
+#league-color {
+    background-color: white;
 }

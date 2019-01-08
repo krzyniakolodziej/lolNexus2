@@ -46,18 +46,57 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.log(summonerName, 'summ')
                 console.log(name, 'resp name')
-                return "color:pink;"
+                return "color:black;"
             }
+        }
+
+        function setLeagueColor(tier) {
+            if (tier === 'GOLD') {
+
+            }
+        }
+
+        function colorTier(tier) {
+            if (tier === 'IRON') {
+                return 'color:#80807F';
+            } else if (tier === 'SILVER') {
+                return 'color:#A2A28D';
+            } else if (tier === 'GOLD') {
+                return 'color:#F0B600';
+            } else if (tier === 'PLATINUM') {
+                return 'color:#19AD41';
+            } else if (tier === 'DIAMOND') {
+                return 'color:#6CD5FC';
+            } else if (tier === 'MASTER') {
+                return 'color:#5F863E';
+            } else if (tier === 'CHALLENGER') {
+                return 'color:#869800'
+            }
+            else {
+                return 'color:black';
+            }
+        }
+
+        function getFirstLeague(response) {
+            return `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: <mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark>;`
+        }
+        function getSecondLeague(response) {
+            return ` ${displayEasyLeagues(response[1].queueType)}: <mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark>;`
+        }
+        function getThirdLeague(response) {
+            return ` ${displayEasyLeagues(response[2].queueType)}: <mark id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</mark>`
         }
 
         function pushFirstTeamInfo(response) {
             team1.style.display = "block";
-            if (response[0] && response[1] && response[2]) { // add pink color for player with 3 rankedQs and input name = summoner name
-                team1.innerHTML += `<strong style = ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank} ; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank}<br>`;
+            if (response[0] && response[1] && response[2]) {
+                // add black!!! color for player with 3 rankedQs and input name != summoner name
+                // team1.innerHTML += `<strong style = ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier}</mark>` + `${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark><br>` `; ${displayEasyLeagues(response[2].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</mark><br>`;
+                team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + getThirdLeague(response) + '<br>';
             } else if (response[0] && response[1]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}<br>`;
+                team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + '<br>';
             } else if (response[0]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}<br>`;
+                team1.innerHTML += getFirstLeague(response) + '<br>';
             } else if (!response[0]) {
                 team1.innerHTML += `Unranked<br>`
             }
@@ -74,11 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         function pushSecondTeamInfo(response) {
             team2.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank} <br>`;
+                team2.innerHTML += getFirstLeague(response) + getSecondLeague(response) + getThirdLeague(response) + '<br>';
             } else if (response[0] && response[1]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}<br>`;
+                team2.innerHTML += getFirstLeague(response) + getSecondLeague(response) + '<br>';
             } else if (response[0]) {
-                team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}<br>`;
+                team2.innerHTML += getFirstLeague(response) + '<br>';
             } else if (!response[0]) {
                 team2.innerHTML += `Unranked ${console.log(response)}`
             }
