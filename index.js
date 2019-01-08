@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const team1 = document.getElementById('team1');
     const team2 = document.getElementById('team2');
     const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
+    const loader1 = document.getElementById('loader1');
+    const loader2 = document.getElementById('loader2');
     const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
@@ -18,11 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     submitButton.addEventListener('click', () => {
-
         team1.innerHTML = '';
         team1.style.display = "none"
+        loader1.style.display = "inline-block";
         team2.innerHTML = '';
         team2.style.display = "none"
+        loader2.style.display = "inline-block";
         errorField.innerHTML = ''
         regenerateApiKeyButton.style.display = "none";
         summonerName = input.value;
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function colorTier(tier) {
             if (tier === 'IRON') {
-                return 'color:#80807F';
+                return 'color:#7E5307';
             } else if (tier === 'SILVER') {
                 return 'color:#A2A28D';
             } else if (tier === 'GOLD') {
@@ -100,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (!response[0]) {
                 team1.innerHTML += `Unranked<br>`
             }
+            loader1.style.display = "none";
         }
         function displayEasyLeagues(response) {
             if (response === 'RANKED_SOLO_5x5') {
@@ -119,8 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (response[0]) {
                 team2.innerHTML += getFirstLeague(response) + '<br>';
             } else if (!response[0]) {
-                team2.innerHTML += `Unranked ${console.log(response)}`
+                team2.innerHTML += `Unranked<br>`
             }
+            loader2.style.display = "none";
         }
 
         function getFirstTeamSummonerInfo() {
@@ -214,13 +219,29 @@ document.addEventListener('DOMContentLoaded', () => {
                                 console.log(resp.status.status_code);
                                 console.log(resp.status)
                                 errorField.style.display = 'block';
+                                loader1.style.display = "none";
+                                loader2.style.display = "none";
                                 regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'Invalid API key';
                                 reject(resp.status.message);
-                            } else {
+                            } else if (resp.status.status_code === 429) {
                                 console.log(resp.status.status_code);
                                 console.log(resp.status)
                                 errorField.style.display = 'block';
+                                loader1.style.display = "none";
+                                loader2.style.display = "none";
+                                team1.innerHTML = '';
+                                team2.innerHTML = '';
+                                regenerateApiKeyButton.style.display = 'inline-block'
+                                errorField.innerHTML = 'API limit exceeded';
+                                reject(resp.status.message);
+                            }
+                            else {
+                                console.log(resp.status.status_code);
+                                console.log(resp.status)
+                                errorField.style.display = 'block';
+                                loader1.style.display = "none";
+                                loader2.style.display = "none";
                                 errorField.innerText = `${resp.status.message}`;
                                 reject(resp.status.message);
                             }
