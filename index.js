@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const team1 = document.getElementById('team1');
     const team2 = document.getElementById('team2');
     const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
-    const team1DataElements = document.getElementById('team1');
-    const team2DataElements = document.getElementById('team2');
     const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
@@ -20,12 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     submitButton.addEventListener('click', () => {
+
+        team1.innerHTML = '';
+        team1.style.display = "none"
+        team2.innerHTML = '';
+        team2.style.display = "none"
         errorField.innerHTML = ''
         regenerateApiKeyButton.style.display = "none";
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
         // console.log(summonerName);
-
         return getPlayerData(summonerDataUrl)
             .then(getCurrentGameInfo)
             .then(getPlayerData)
@@ -34,17 +36,30 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(createArrayOfNameLinks)
             .then(getSummonerId)
 
+        function colorRedSearchedPlayer(name) {
+            // console.log(summonerName, 'summ')
+            // console.log(name, 'resp name')
+            if (name === summonerName) {
+                console.log(summonerName, 'summ')
+                console.log(name, 'resp name')
+                return "color:red;"
+            } else {
+                console.log(summonerName, 'summ')
+                console.log(name, 'resp name')
+                return "color:pink;"
+            }
+        }
+
         function pushFirstTeamInfo(response) {
-            console.log(response[3])
-            team1DataElements.style.display = "block";
-            if (response[0] && response[1] && response[2]) {
-                team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank} ; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank}<br>`;
+            team1.style.display = "block";
+            if (response[0] && response[1] && response[2]) { // add pink color for player with 3 rankedQs and input name = summoner name
+                team1.innerHTML += `<strong style = ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank} ; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank}<br>`;
             } else if (response[0] && response[1]) {
                 team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}<br>`;
             } else if (response[0]) {
                 team1.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}<br>`;
             } else if (!response[0]) {
-                team1.innerHTML += `Unranked ${console.log(response)}`
+                team1.innerHTML += `Unranked<br>`
             }
         }
         function displayEasyLeagues(response) {
@@ -57,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         function pushSecondTeamInfo(response) {
-            team2DataElements.style.display = "block";
+            team2.style.display = "block";
             if (response[0] && response[1] && response[2]) {
                 team2.innerHTML += `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${response[0].tier} ${response[0].rank}; ${displayEasyLeagues(response[1].queueType)}: ${response[1].tier} ${response[1].rank}; ${displayEasyLeagues(response[2].queueType)}: ${response[2].tier} ${response[2].rank} <br>`;
             } else if (response[0] && response[1]) {
