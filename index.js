@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = 'RGAPI-ce29fd76-c740-4e18-92d8-421af92d2c3b';
+    const apiKey = 'RGAPI-21a82982-c68c-46e1-9e5d-25ced2f981f0';
     let summonerName;
     const input = document.getElementById('input');
     const submitButton = document.getElementById('btn');
@@ -20,20 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     submitButton.addEventListener('click', () => {
-        lockFetch();
-        doEverything();
+        disableSubmit();
+        displayTeamsInformation();
     });
     input.addEventListener('keydown', e => {
         if (e.keyCode === 13) {
-            lockFetch();
-            doEverything();
+            disableSubmit();
+            displayTeamsInformation();
         }
     });
-    function lockFetch() {
+    function disableSubmit() {
         submitButton.disabled = true;
         input.disabled = true;
     }
-    function unlockFetch() {
+    function enableSumbmit() {
         submitButton.disabled = false;
         input.disabled = false;
     }
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errorField.innerHTML = ''
         regenerateApiKeyButton.style.display = "none";
     }
-    function doEverything() {
+    function displayTeamsInformation() {
         clearFieldsSetLoading();
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
@@ -75,43 +75,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        function setLeagueColor(tier) { // ask mati or kuba pls <--------------------------------------------------------
-            if (tier === 'GOLD') {
-
-            }
-        }
-
         function colorTier(tier) {
-            if (tier === 'IRON') {
-                return 'color:#7E5307';
-            } else if (tier === 'BRONZE') {
-                return 'color:#7E5307';
-            } else if (tier === 'SILVER') {
-                return 'color:#A2A28D';
-            } else if (tier === 'GOLD') {
-                return 'color:#F0B600';
-            } else if (tier === 'PLATINUM') {
-                return 'color:#19AD41';
-            } else if (tier === 'DIAMOND') {
-                return 'color:#6CD5FC';
-            } else if (tier === 'MASTER') {
-                return 'color:#5F863E';
-            } else if (tier === 'CHALLENGER') {
-                return 'color:#869800'
-            }
-            else {
-                return 'color:black';
+            switch (tier) {
+                case 'IRON': return 'color:#6D6B6B';
+                case 'BRONZE': return 'color:#7E5307';
+                case 'SILVER': return 'color:#A2A28D';
+                case 'GOLD': return 'color:#F0B600';
+                case 'PLATINUM': return 'color:#19AD41';
+                case 'DIAMOND': return 'color:#6CD5FC';
+                case 'MASTER': return 'color:#5F863E';
+                case 'CHALLENGER': return 'color:#869800';
+                default: return 'color:black';
             }
         }
 
         function getFirstLeague(response) {
-            return `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: <mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark>;`
+            return `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: <span id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</span>;`
         }
         function getSecondLeague(response) {
-            return ` ${displayEasyLeagues(response[1].queueType)}: <mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark>;`
+            return ` ${displayEasyLeagues(response[1].queueType)}: <span id="league-color" style="${colorTier(response[1].tier)}">${response[1].tier} ${response[1].rank}</span>;`
         }
         function getThirdLeague(response) {
-            return ` ${displayEasyLeagues(response[2].queueType)}: <mark id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</mark>`
+            return ` ${displayEasyLeagues(response[2].queueType)}: <span id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</span>`
         }
 
         function pushFirstTeamInfo(response) {
@@ -174,12 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     getPlayerData(element.link)
                         .then(createFirstArrayOfSummonerIds)
                         .then(getFirstTeamSummonerInfo)
-                        .then(unlockFetch)
+                        .then(enableSumbmit)
                 } else {
                     getPlayerData(element.link)
                         .then(createSecondArrayOfSummonerIds)
                         .then(getSecondTeamSummonerInfo)
-                        .then(unlockFetch)
+                        .then(enableSumbmit)
                 }
             })
             return;
@@ -219,9 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < 10; i++) {
                 summonersTeams.push(allPlayerNames[i]);
             }
-            // for (let i = 5; i < 10; i++) {
-            //     secondTeam.push(allPlayerNames[i]);
-            // }
             console.log('summonerTeams', summonersTeams)
             // console.log('second', secondTeam)
         }
@@ -249,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader2.style.display = "none";
                                 regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'Invalid API key';
-                                unlockFetch();
+                                enableSumbmit();
                                 reject(resp.status.message);
                             } else if (resp.status.status_code === 400) {
                                 console.log(resp.status.status_code);
@@ -258,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader1.style.display = "none";
                                 loader2.style.display = "none";
                                 errorField.innerHTML = 'Enter a valid summoner name';
-                                unlockFetch();
+                                enableSumbmit();
                             }
                             else if (resp.status.status_code === 429) {
                                 console.log(resp.status.status_code);
@@ -269,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 team1.innerHTML = '';
                                 team2.innerHTML = '';
                                 errorField.innerHTML = 'API limit exceeded';
-                                unlockFetch();
+                                enableSumbmit();
                                 reject(resp.status.message);
                             }
                             else {
@@ -279,11 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 loader1.style.display = "none";
                                 loader2.style.display = "none";
                                 errorField.innerText = `${resp.status.message}`;
-                                unlockFetch();
+                                enableSumbmit();
                                 reject(resp.status.message);
                             }
                         }
-                        unlockFetch();
+                        enableSumbmit();
                         resolve(resp);
                     })
                     .catch(error => {
