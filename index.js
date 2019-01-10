@@ -9,15 +9,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
     const loader1 = document.getElementById('loader1');
     const loader2 = document.getElementById('loader2');
+    const unrankedImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/unranked-season-rewards-lol.png';
+    const ironImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Iron_1.png';
+    const bronzeImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Bronze_1.png';
+    const silverImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Silver_1.png';
+    const goldImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Gold_1.png';
+    const platinumImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Platinum_1.png';
+    const diamondImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Diamond_1.png';
+    const masterImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Master_1.png';
+    const grandmasterImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Grandmaster_1.png';
+    const challengerImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Challenger_1.png';
     const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
     const firstTeamIds = [];
     const secondTeamIds = [];
 
+    function loadImage(source) {
+        return `<img class="league-img" src="${source}" alt=""/>`;
+    }
+    function insertLeagueIcon(tier) {
+        switch (tier) {
+            case 'IRON': return loadImage(ironImg);
+            case 'BRONZE': return loadImage(bronzeImg);
+            case 'SILVER': return loadImage(silverImg);
+            case 'GOLD': return loadImage(goldImg);
+            case 'PLATINUM': return loadImage(platinumImg);
+            case 'DIAMOND': return loadImage(diamondImg);
+            case 'MASTER': return loadImage(masterImg);
+            case 'GRANDMASTER': return loadImage(grandmasterImg);
+            case 'CHALLENGER': return loadImage(challengerImg);
+            default: return loadImage(unrankedImg);
+        }
+    }
+
     regenerateApiKeyButton.addEventListener('click', () => {
         window.open("https://developer.riotgames.com/");
-    })
+    });
 
     submitButton.addEventListener('click', () => {
         disableSubmit();
@@ -27,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.keyCode === 13) {
             disableSubmit();
             displayTeamsInformation();
-        }
+        };
     });
     function disableSubmit() {
         submitButton.disabled = true;
@@ -61,20 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(getSummonerId)
 
 
-        function colorRedSearchedPlayer(name) {
-            // console.log(summonerName, 'summ')
-            // console.log(name, 'resp name')
-            if (name === summonerName) {
-                console.log(summonerName, 'summ')
-                console.log(name, 'resp name')
-                return "color:red;"
-            } else {
-                console.log(summonerName, 'summ')
-                console.log(name, 'resp name')
-                return "color:black;"
-            }
-        }
-
         function colorTier(tier) {
             switch (tier) {
                 case 'IRON': return 'color:#6D6B6B';
@@ -84,26 +98,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'PLATINUM': return 'color:#19AD41';
                 case 'DIAMOND': return 'color:#6CD5FC';
                 case 'MASTER': return 'color:#5F863E';
+                case 'GRANDMASTER': return 'colorB40B25';
                 case 'CHALLENGER': return 'color:#869800';
                 default: return 'color:black';
             }
         }
 
         function getFirstLeague(response) {
-            return `<strong>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: <span id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</span>;`
+            return `<strong ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${insertLeagueIcon(response[0].tier)} <span class="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</span>;`
         }
         function getSecondLeague(response) {
-            return ` ${displayEasyLeagues(response[1].queueType)}: <span id="league-color" style="${colorTier(response[1].tier)}">${response[1].tier} ${response[1].rank}</span>;`
+            return ` ${displayEasyLeagues(response[1].queueType)}: ${insertLeagueIcon(response[1].tier)} <span class="league-color" style="${colorTier(response[1].tier)}">${response[1].tier} ${response[1].rank}</span>;`
         }
         function getThirdLeague(response) {
-            return ` ${displayEasyLeagues(response[2].queueType)}: <span id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</span>`
+            return ` ${displayEasyLeagues(response[2].queueType)}: ${insertLeagueIcon(response[2].tier)} <span class="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</span>`
         }
 
+        function colorRedSearchedPlayer(name) {
+            if (name === summonerName) {
+                return 'style="color:red;"';
+            } else {
+                return 'style="color:black;"';
+            }
+        }
         function pushFirstTeamInfo(response) {
             team1.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                // add black!!! color for player with 3 rankedQs and input name != summoner name
-                // team1.innerHTML += `<strong style = ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier}</mark>` + `${response[0].rank} ; ${displayEasyLeagues(response[1].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</mark><br>` `; ${displayEasyLeagues(response[2].queueType)}: ` + `<mark id="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</mark><br>`;
                 team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + getThirdLeague(response) + '<br>';
             } else if (response[0] && response[1]) {
                 team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + '<br>';
@@ -116,11 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         function displayEasyLeagues(response) {
             if (response === 'RANKED_SOLO_5x5') {
-                return 'SoloQ'
+                return '<span class="easy-leagues">SoloQ</span>';
             } else if (response === 'RANKED_FLEX_SR') {
-                return 'Flex'
+                return '<span class="easy-leagues">Flex</span>';
             } else {
-                return '3v3'
+                return '<span class="easy-leagues">3v3</span>';
             }
         }
         function pushSecondTeamInfo(response) {
@@ -153,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function getSummonerId(arrayOfSummonerLinks) {
-            // console.log('dupa', firstTeamLinks)
             arrayOfSummonerLinks.forEach(element => {
                 if (element.id < arrayOfSummonerLinks.length / 2) {
                     getPlayerData(element.link)
@@ -172,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function createFirstArrayOfSummonerIds(summonerResponse) {
             firstTeamIds.push(summonerResponse.id);
+            console.log(firstTeamIds, 'ids1');
             return summonerResponse;
         }
 

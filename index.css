@@ -14,7 +14,7 @@ div {
 }
 .team {
     margin-top: 10px;
-    width: 25%;
+    width: 45%;
     border: 1px solid black;
     /* float: center; */
     display:inline-block;
@@ -46,3 +46,14 @@ div {
     0% { transform: rotate(360deg); }
     100% { transform: rotate(0deg); }
   }
+  .league-img {
+      height: 5%;
+      width: 5%;
+      position: relative;
+  }
+  /* .easy-leagues {
+position: absolute;
+  } */
+  /* .league-color {
+      position: absolute;
+  } */
