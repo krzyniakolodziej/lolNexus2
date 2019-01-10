@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = 'RGAPI-21a82982-c68c-46e1-9e5d-25ced2f981f0';
+    let apiKey = 'RGAPI-5f129fee-a745-4c5e-8be0-4fb6726639a4';
     let summonerName;
     const input = document.getElementById('input');
     const submitButton = document.getElementById('btn');
@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const regenerateApiKeyButton = document.getElementById('regenerate-api-key');
     const loader1 = document.getElementById('loader1');
     const loader2 = document.getElementById('loader2');
+    const submitKeyDiv = document.getElementById('submit-new-key-div');
+    const apiKeyInput = document.getElementById('api-input');
+    const apiKeyButton = document.getElementById('submit-api-key-button');
     const unrankedImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/unranked-season-rewards-lol.png';
     const ironImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Iron_1.png';
     const bronzeImg = 'https://img.rankedboost.com/wp-content/uploads/2014/09/Season_2019_-_Bronze_1.png';
@@ -26,22 +29,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const secondTeamIds = [];
 
     function loadImage(source) {
-        return `<img class="league-img" src="${source}" alt=""/>`;
+        return `<img class="league-img" src="${source}" alt="${source}"/>`;
     }
     function insertLeagueIcon(tier) {
-        switch (tier) {
-            case 'IRON': return loadImage(ironImg);
-            case 'BRONZE': return loadImage(bronzeImg);
-            case 'SILVER': return loadImage(silverImg);
-            case 'GOLD': return loadImage(goldImg);
-            case 'PLATINUM': return loadImage(platinumImg);
-            case 'DIAMOND': return loadImage(diamondImg);
-            case 'MASTER': return loadImage(masterImg);
-            case 'GRANDMASTER': return loadImage(grandmasterImg);
-            case 'CHALLENGER': return loadImage(challengerImg);
-            default: return loadImage(unrankedImg);
+        if (tier) {
+            switch (tier) {
+                case 'IRON': return loadImage(ironImg);
+                case 'BRONZE': return loadImage(bronzeImg);
+                case 'SILVER': return loadImage(silverImg);
+                case 'GOLD': return loadImage(goldImg);
+                case 'PLATINUM': return loadImage(platinumImg);
+                case 'DIAMOND': return loadImage(diamondImg);
+                case 'MASTER': return loadImage(masterImg);
+                case 'GRANDMASTER': return loadImage(grandmasterImg);
+                case 'CHALLENGER': return loadImage(challengerImg);
+            }
+        } else {
+            return loadImage(unrankedImg);
         }
     }
+
+    apiKeyButton.addEventListener('click', () => {
+        apiKey = apiKeyInput.value;
+        console.log(apiKeyInput.value);
+        console.log(apiKey);
+    })
 
     regenerateApiKeyButton.addEventListener('click', () => {
         window.open("https://developer.riotgames.com/");
@@ -65,21 +77,22 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.disabled = false;
         input.disabled = false;
     }
+
     function clearFieldsSetLoading() {
         team1.innerHTML = '';
-        team1.style.display = "none"
+        team1.style.display = "none";
         loader1.style.display = "inline-block";
         team2.innerHTML = '';
-        team2.style.display = "none"
+        team2.style.display = "none";
         loader2.style.display = "inline-block";
-        errorField.innerHTML = ''
+        errorField.innerHTML = '';
+        submitKeyDiv.style.display = "none";
         regenerateApiKeyButton.style.display = "none";
     }
     function displayTeamsInformation() {
         clearFieldsSetLoading();
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
-        // console.log(summonerName);
         return getPlayerData(summonerDataUrl)
             .then(getCurrentGameInfo)
             .then(getPlayerData)
@@ -87,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(setPlayerTeams)
             .then(createArrayOfNameLinks)
             .then(getSummonerId)
-
 
         function colorTier(tier) {
             switch (tier) {
@@ -103,17 +115,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 default: return 'color:black';
             }
         }
-
-        function getFirstLeague(response) {
-            return `<strong ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong> ${displayEasyLeagues(response[0].queueType)}: ${insertLeagueIcon(response[0].tier)} <span class="league-color" style="${colorTier(response[0].tier)}">${response[0].tier} ${response[0].rank}</span>;`
+        function createThreeLeagues(response) {
+            return `<section class="content-section">
+            <div class="name">${getSummonerName(response)}</div>
+            <div class="queue-icon-league-div">
+                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
+                ${insertLeagueIcon(response[0].tier)}
+                <div class="league">${response[0].tier} ${response[0].rank}</div>
+            </div>
+            <div class="queue-icon-league-div">
+            <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
+            ${insertLeagueIcon(response[1].tier)}
+            <div class="league">${response[1].tier} ${response[1].rank}</div>
+        </div>
+        <div class="queue-icon-league-div">
+        <div class="queue">${displayEasyLeagues(response[2].queueType)}</div>
+        ${insertLeagueIcon(response[2].tier)}
+        <div class="league">${response[2].tier} ${response[2].rank}</div>
+    </div>
+        </section>`
         }
-        function getSecondLeague(response) {
-            return ` ${displayEasyLeagues(response[1].queueType)}: ${insertLeagueIcon(response[1].tier)} <span class="league-color" style="${colorTier(response[1].tier)}">${response[1].tier} ${response[1].rank}</span>;`
+        function createTwoLeagues(response) {
+            return `<section class="content-section">
+            <div class="name">${getSummonerName(response)}</div>
+            <div class="queue-icon-league-div">
+                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
+                ${insertLeagueIcon(response[0].tier)}
+                <div class="league">${response[0].tier} ${response[0].rank}</div>
+            </div>
+            <div class="queue-icon-league-div">
+            <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
+            ${insertLeagueIcon(response[1].tier)}
+            <div class="league">${response[1].tier} ${response[1].rank}</div>
+            </div>
+        </section>`
         }
-        function getThirdLeague(response) {
-            return ` ${displayEasyLeagues(response[2].queueType)}: ${insertLeagueIcon(response[2].tier)} <span class="league-color" style="${colorTier(response[2].tier)}">${response[2].tier} ${response[2].rank}</span>`
+        function createOneLeague(response) {
+            return `<section class="content-section">
+            <div class="name">${getSummonerName(response)}</div>
+            <div class="queue-icon-league-div">
+                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
+                ${insertLeagueIcon(response[0].tier)}
+                <div class="league">${response[0].tier} ${response[0].rank}</div>
+            </div>
+        </section>`
         }
-
+        function getSummonerName(response) {
+            return `<strong ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong>`;
+        }
         function colorRedSearchedPlayer(name) {
             if (name === summonerName) {
                 return 'style="color:red;"';
@@ -124,13 +173,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function pushFirstTeamInfo(response) {
             team1.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + getThirdLeague(response) + '<br>';
+                team1.innerHTML += createThreeLeagues(response);
             } else if (response[0] && response[1]) {
-                team1.innerHTML += getFirstLeague(response) + getSecondLeague(response) + '<br>';
+                team1.innerHTML += createTwoLeagues(response);
             } else if (response[0]) {
-                team1.innerHTML += getFirstLeague(response) + '<br>';
+                team1.innerHTML += createOneLeague(response);
             } else if (!response[0]) {
-                team1.innerHTML += `Unranked<br>`
+                team1.innerHTML += `Unranked`
             }
             loader1.style.display = "none";
         }
@@ -146,13 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function pushSecondTeamInfo(response) {
             team2.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team2.innerHTML += getFirstLeague(response) + getSecondLeague(response) + getThirdLeague(response) + '<br>';
+                team2.innerHTML += createThreeLeagues(response);
             } else if (response[0] && response[1]) {
-                team2.innerHTML += getFirstLeague(response) + getSecondLeague(response) + '<br>';
+                team2.innerHTML += createTwoLeagues(response);
             } else if (response[0]) {
-                team2.innerHTML += getFirstLeague(response) + '<br>';
+                team2.innerHTML += createOneLeague(response);
             } else if (!response[0]) {
-                team2.innerHTML += `Unranked<br>`
+                team2.innerHTML += `Unranked`
             }
             loader2.style.display = "none";
         }
@@ -191,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function createFirstArrayOfSummonerIds(summonerResponse) {
             firstTeamIds.push(summonerResponse.id);
-            console.log(firstTeamIds, 'ids1');
             return summonerResponse;
         }
 
@@ -247,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 console.log(resp.status.status_code);
                                 console.log(resp.status)
                                 errorField.style.display = 'block';
+                                submitKeyDiv.style.display = 'block';
                                 loader1.style.display = "none";
                                 loader2.style.display = "none";
                                 regenerateApiKeyButton.style.display = 'inline-block'

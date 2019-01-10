@@ -14,10 +14,12 @@ div {
 }
 .team {
     margin-top: 10px;
-    width: 45%;
+    margin-left: 10%;
+    width: 80%;
     border: 1px solid black;
-    /* float: center; */
-    display:inline-block;
+    float: center;
+    display:block;
+    text-align: center;
 }
 
 #regenerate-api-key {
@@ -25,7 +27,7 @@ div {
     display:none;
 }
 .team-content {
-    text-align: left;
+    text-align: center;
     border: 1px solid black;
     margin-left: 5px;
     margin-right: 5px;
@@ -46,14 +48,37 @@ div {
     0% { transform: rotate(360deg); }
     100% { transform: rotate(0deg); }
   }
-  .league-img {
-      height: 5%;
-      width: 5%;
-      position: relative;
-  }
+
   /* .easy-leagues {
 position: absolute;
   } */
   /* .league-color {
       position: absolute;
   } */
+  #submit-new-key-div {
+      display: none;
+  }
+  .content-section {
+    display:inline-block; 
+    margin-right: 20px; 
+    margin-left: 20px;
+  }
+  .queue-icon-league-div {
+    display:inline-block; 
+    margin:5px;
+  }
+  .name {
+    text-align:center;
+  }
+  .league-img {
+    height: 20%;
+    width: 50px;
+    position: relative;
+    display:inline-block;
+}
+.league {
+    text-align: center;
+}
+.queue {
+    text-align: center;
+}
