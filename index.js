@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let apiKey = 'RGAPI-5f129fee-a745-4c5e-8be0-4fb6726639a4';
+    let apiKey = 'RGAPI-7d42855e-c907-4438-a6e2-20dc15e33910';
     let summonerName;
     const input = document.getElementById('input');
     const submitButton = document.getElementById('btn');
@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const masterImg = './images/Season_2019_-_Master_1.png';
     const grandmasterImg = './images/Season_2019_-_Grandmaster_1.png';
     const challengerImg = './images/Season_2019_-_Challenger_1.png';
-    const playerNames = [];
     const summonersTeams = [];
     const arrayOfLinksAndIds = [];
     const firstTeamIds = [];
@@ -54,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     apiKeyButton.addEventListener('click', () => {
         apiKey = apiKeyInput.value;
-        console.log(apiKeyInput.value);
-        console.log(apiKey);
     })
 
     regenerateApiKeyButton.addEventListener('click', () => {
@@ -64,12 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     submitButton.addEventListener('click', () => {
         disableSubmit();
-        displayTeamsInformation();
+        displayTeamsInformationMainFunction();
     });
     input.addEventListener('keydown', e => {
         if (e.keyCode === 13) {
             disableSubmit();
-            displayTeamsInformation();
+            displayTeamsInformationMainFunction();
         };
     });
     function disableSubmit() {
@@ -92,13 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
         submitKeyDiv.style.display = "none";
         regenerateApiKeyButton.style.display = "none";
     }
-    function displayTeamsInformation() {
+    function displayTeamsInformationMainFunction() {
         clearFieldsSetLoading();
         summonerName = input.value;
         const summonerDataUrl = `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}?api_key=${apiKey}`;
-        return getPlayerData(summonerDataUrl)
+        return fetchData(summonerDataUrl)
             .then(getCurrentGameInfo)
-            .then(getPlayerData)
+            .then(fetchData)
             .then(getPlayersNames)
             .then(setPlayerTeams)
             .then(createArrayOfNameLinks)
@@ -118,208 +115,118 @@ document.addEventListener('DOMContentLoaded', () => {
                 default: return 'color:black';
             }
         }
-        function createThreeLeagues(response) {
+
+        function createLeagueFromFirstResponse(response) {
             return `<section class="content-section">
-            <div class="name">${getSummonerName(response)}</div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                ${insertLeagueIcon(response[0].tier)}
-                <div class="league">${response[0].tier} ${response[0].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
+        <div class="name">${getSummonerName(response)}</div>
+        <div class="queue-icon-league-div">
+        <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
+        ${insertLeagueIcon(response[0].tier)}
+        <div class="league">${response[0].tier} ${response[0].rank}</div>
+     </div>`
+        }
+        function createLeagueFromSecondResponse(response) {
+            return `<div class="queue-icon-league-div">
             <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
             ${insertLeagueIcon(response[1].tier)}
             <div class="league">${response[1].tier} ${response[1].rank}</div>
-        </div>
-        <div class="queue-icon-league-div">
-        <div class="queue">${displayEasyLeagues(response[2].queueType)}</div>
-        ${insertLeagueIcon(response[2].tier)}
-        <div class="league">${response[2].tier} ${response[2].rank}</div>
-    </div>
+        </div>`
+        }
+        function createLeagueFromThirdResponse(response) {
+            return `<div class="queue-icon-league-div">
+            <div class="queue">${displayEasyLeagues(response[2].queueType)}</div>
+            ${insertLeagueIcon(response[2].tier)}
+            <div class="league">${response[2].tier} ${response[2].rank}</div>
+        </div>`
+        }
+        function createLeagueFromNoResponse(tier) {
+            return `<div class="queue-icon-league-div">
+                <div class="queue">${tier}</div>
+                ${insertLeagueIcon()}
+                <div class="league">Unranked</div>
+            </div>`
+        }
+
+        function createThreeLeaguesAndNoUnrankeds(response) {
+            return `<section class="content-section">
+            ${createLeagueFromFirstResponse(response)}
+            ${createLeagueFromSecondResponse(response)}
+            ${createLeagueFromThirdResponse(response)}
         </section>`
         }
-        function createTwoLeagues(response) {
+        function createTwoLeaguesAndOneUnranked(response) {
             if (response[0].queueType === 'RANKED_SOLO_5x5' && response[1].queueType === 'RANKED_FLEX_SR') {
                 return `<section class="content-section">
-            <div class="name">${getSummonerName(response)}</div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                ${insertLeagueIcon(response[0].tier)}
-                <div class="league">${response[0].tier} ${response[0].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
-            <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-            ${insertLeagueIcon(response[1].tier)}
-            <div class="league">${response[1].tier} ${response[1].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
-            <div class="queue">${treelineName}</div>
-            ${insertLeagueIcon()}
-            <div class="league">Unranked</div>
-            </div>
+           ${createLeagueFromFirstResponse(response)}
+            ${createLeagueFromSecondResponse(response)}
+            ${createLeagueFromNoResponse(treelineName)}
         </section>`
             } else if (response[0].queueType === 'RANKED_FLEX_SR' && response[1].queueType === 'RANKED_SOLO_5x5') {
                 return `<section class="content-section">
-                <div class="name">${getSummonerName(response)}</div>
-                <div class="queue-icon-league-div">
-                    <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                    ${insertLeagueIcon(response[0].tier)}
-                    <div class="league">${response[0].tier} ${response[0].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-                ${insertLeagueIcon(response[1].tier)}
-                <div class="league">${response[1].tier} ${response[1].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${treelineName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-                </div>
+               ${createLeagueFromFirstResponse(response)}
+               ${createLeagueFromSecondResponse(response)}
+                ${createLeagueFromNoResponse(treelineName)}
             </section>`
             } else if (response[0].queueType === 'RANKED_SOLO_5x5' && response[1].queueType === 'RANKED_FLEX_TT') {
                 return `<section class="content-section">
-                <div class="name">${getSummonerName(response)}</div>
-                <div class="queue-icon-league-div">
-                    <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                    ${insertLeagueIcon(response[0].tier)}
-                    <div class="league">${response[0].tier} ${response[0].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-                ${insertLeagueIcon(response[1].tier)}
-                <div class="league">${response[1].tier} ${response[1].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${flexName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-                </div>
+               ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromSecondResponse(response)}
+                ${createLeagueFromNoResponse(flexName)}
             </section>`
             } else if (response[0].queueType === 'RANKED_FLEX_TT' && response[0].queueType === 'RANKED_SOLO_5x5') {
                 return `<section class="content-section">
-                <div class="name">${getSummonerName(response)}</div>
-                <div class="queue-icon-league-div">
-                    <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                    ${insertLeagueIcon(response[0].tier)}
-                    <div class="league">${response[0].tier} ${response[0].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-                ${insertLeagueIcon(response[1].tier)}
-                <div class="league">${response[1].tier} ${response[1].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${flexName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-                </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromSecondResponse(response)}
+                ${createLeagueFromNoResponse(flexName)}
             </section>`
             } else if (response[0].queueType === 'RANKED_FLEX_SR' && response[1].queueType === 'RANKED_FLEX_TT') {
                 return `<section class="content-section">
-                <div class="name">${getSummonerName(response)}</div>
-                <div class="queue-icon-league-div">
-                    <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                    ${insertLeagueIcon(response[0].tier)}
-                    <div class="league">${response[0].tier} ${response[0].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-                ${insertLeagueIcon(response[1].tier)}
-                <div class="league">${response[1].tier} ${response[1].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${soloName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-                </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromSecondResponse(response)}
+                ${createLeagueFromNoResponse(soloName)}
             </section>`
             } else if (response[0].queueType === 'RANKED_FLEX_TT' && response[1].queueType === 'RANKED_FLEX_SR') {
                 return `<section class="content-section">
-                <div class="name">${getSummonerName(response)}</div>
-                <div class="queue-icon-league-div">
-                    <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                    ${insertLeagueIcon(response[0].tier)}
-                    <div class="league">${response[0].tier} ${response[0].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[1].queueType)}</div>
-                ${insertLeagueIcon(response[1].tier)}
-                <div class="league">${response[1].tier} ${response[1].rank}</div>
-                </div>
-                <div class="queue-icon-league-div">
-                <div class="queue">${soloName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-                </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromSecondResponse(response)}
+                ${createLeagueFromNoResponse(soloName)}
             </section>`
             }
         }
-        function createOneLeague(response) {
+        function createOneLeagueAndTwoUnrankeds(response) {
             if (response[0].queueType === 'RANKED_SOLO_5x5') {
                 return `<section class="content-section">
-            <div class="name">${getSummonerName(response)}</div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                ${insertLeagueIcon(response[0].tier)}
-                <div class="league">${response[0].tier} ${response[0].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${flexName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${treelineName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromNoResponse(flexName)}
+                ${createLeagueFromNoResponse(treelineName)}
         </section>`
             } else if (response[0].queueType === 'RANKED_FLEX_SR') {
                 return `<section class="content-section">
-            <div class="name">${getSummonerName(response)}</div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                ${insertLeagueIcon(response[0].tier)}
-                <div class="league">${response[0].tier} ${response[0].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${soloName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${treelineName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromNoResponse(soloName)}
+                ${createLeagueFromNoResponse(treelineName)}
         </section>`
             } else {
                 return `<section class="content-section">
-            <div class="name">${getSummonerName(response)}</div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${displayEasyLeagues(response[0].queueType)}</div>
-                ${insertLeagueIcon(response[0].tier)}
-                <div class="league">${response[0].tier} ${response[0].rank}</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${soloName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
-            <div class="queue-icon-league-div">
-                <div class="queue">${flexName}</div>
-                ${insertLeagueIcon()}
-                <div class="league">Unranked</div>
-            </div>
+                ${createLeagueFromFirstResponse(response)}
+                ${createLeagueFromNoResponse(soloName)}
+            ${createLeagueFromNoResponse(flexName)}
         </section>`
             }
         }
+        function createZeroLeaguesAndThreeUnrankeds() {
+            return `<section class="content-section">
+            <div class="name">Unknown</div>
+            ${createLeagueFromNoResponse('SoloQ')}
+            ${createLeagueFromNoResponse('Flex')}
+            ${createLeagueFromNoResponse('3v3')}
+            </section>`
+        }
         function getSummonerName(response) {
-            return `<strong ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong>`;
+            return `<strong ${colorRedSearchedPlayer(response[0].summonerName)}>${response[0].summonerName}</strong>`
         }
         function colorRedSearchedPlayer(name) {
-            if (name === summonerName) {
+            if (name.toLowerCase() === summonerName.toLowerCase()) {
                 return 'style="color:red;"';
             } else {
                 return 'style="color:black;"';
@@ -328,13 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function pushFirstTeamInfo(response) {
             team1.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team1.innerHTML += createThreeLeagues(response);
+                team1.innerHTML += createThreeLeaguesAndNoUnrankeds(response);
             } else if (response[0] && response[1]) {
-                team1.innerHTML += createTwoLeagues(response);
+                team1.innerHTML += createTwoLeaguesAndOneUnranked(response);
             } else if (response[0]) {
-                team1.innerHTML += createOneLeague(response);
+                team1.innerHTML += createOneLeagueAndTwoUnrankeds(response);
             } else if (!response[0]) {
-                team1.innerHTML += `Unranked`
+                team1.innerHTML += createZeroLeaguesAndThreeUnrankeds();
             }
             loader1.style.display = "none";
         }
@@ -350,11 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
         function pushSecondTeamInfo(response) {
             team2.style.display = "block";
             if (response[0] && response[1] && response[2]) {
-                team2.innerHTML += createThreeLeagues(response);
+                team2.innerHTML += createThreeLeaguesAndNoUnrankeds(response);
             } else if (response[0] && response[1]) {
-                team2.innerHTML += createTwoLeagues(response);
+                team2.innerHTML += createTwoLeaguesAndOneUnranked(response);
             } else if (response[0]) {
-                team2.innerHTML += createOneLeague(response);
+                team2.innerHTML += createOneLeagueAndTwoUnrankeds(response);
             } else if (!response[0]) {
                 team2.innerHTML += `Unranked`
             }
@@ -363,25 +270,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function getFirstTeamSummonerInfo() {
             const firstTeamDataUrl = `https://eun1.api.riotgames.com/lol/league/v4/positions/by-summoner/${firstTeamIds[firstTeamIds.length - 1]}?api_key=${apiKey}`;
-            getPlayerData(firstTeamDataUrl)
+            fetchData(firstTeamDataUrl)
                 .then(pushFirstTeamInfo)
         }
 
         function getSecondTeamSummonerInfo() {
             const secondTeamDataUrl = `https://eun1.api.riotgames.com/lol/league/v4/positions/by-summoner/${secondTeamIds[secondTeamIds.length - 1]}?api_key=${apiKey}`;
-            getPlayerData(secondTeamDataUrl)
+            fetchData(secondTeamDataUrl)
                 .then(pushSecondTeamInfo)
         }
 
         function getSummonerId(arrayOfSummonerLinks) {
+            console.log(arrayOfSummonerLinks, 'summlinks');
             arrayOfSummonerLinks.forEach(element => {
                 if (element.id < arrayOfSummonerLinks.length / 2) {
-                    getPlayerData(element.link)
+                    fetchData(element.link)
                         .then(createFirstArrayOfSummonerIds)
                         .then(getFirstTeamSummonerInfo)
                         .then(enableSumbmit)
                 } else {
-                    getPlayerData(element.link)
+                    fetchData(element.link)
                         .then(createSecondArrayOfSummonerIds)
                         .then(getSecondTeamSummonerInfo)
                         .then(enableSumbmit)
@@ -412,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function getPlayersNames(currentGameData) {
+            let playerNames = [];
             currentGameData.participants.forEach(element => {
                 playerNames.push(element.summonerName)
             });
@@ -431,8 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(summonerId);
             return currentGameLink;
         }
-
-        function getPlayerData(url) {
+        function hideLoadersClearTeamsAndDisplayErrorDiv(resp) {
+            console.log(resp.status)
+            errorField.style.display = 'block';
+            loader1.style.display = "none";
+            loader2.style.display = "none";
+            team1.innerHTML = '';
+            team2.innerHTML = '';
+        }
+        function fetchData(url) {
             return new Promise((resolve, reject) => {
                 fetch(`https://cors.io/?${url}`)
                     .then(resp => {
@@ -441,43 +357,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(resp => {
                         if (resp.status) {
                             if (resp.status.status_code === 403) {
-                                console.log(resp.status.status_code);
-                                console.log(resp.status)
-                                errorField.style.display = 'block';
+                                hideLoadersClearTeamsAndDisplayErrorDiv(resp);
                                 submitKeyDiv.style.display = 'block';
-                                loader1.style.display = "none";
-                                loader2.style.display = "none";
                                 regenerateApiKeyButton.style.display = 'inline-block'
                                 errorField.innerHTML = 'Invalid API key';
                                 enableSumbmit();
                                 reject(resp.status.message);
                             } else if (resp.status.status_code === 400) {
-                                console.log(resp.status.status_code);
-                                console.log(resp.status)
-                                errorField.style.display = 'block';
-                                loader1.style.display = "none";
-                                loader2.style.display = "none";
+                                hideLoadersClearTeamsAndDisplayErrorDiv(resp);
                                 errorField.innerHTML = 'Enter a valid summoner name';
                                 enableSumbmit();
+                                reject(resp.status.message);
                             }
                             else if (resp.status.status_code === 429) {
-                                console.log(resp.status.status_code);
-                                console.log(resp.status)
-                                errorField.style.display = 'block';
-                                loader1.style.display = "none";
-                                loader2.style.display = "none";
-                                team1.innerHTML = '';
-                                team2.innerHTML = '';
+                                hideLoadersClearTeamsAndDisplayErrorDiv(resp);
                                 errorField.innerHTML = 'API limit exceeded';
                                 enableSumbmit();
                                 reject(resp.status.message);
                             }
                             else {
-                                console.log(resp.status.status_code);
-                                console.log(resp.status)
-                                errorField.style.display = 'block';
-                                loader1.style.display = "none";
-                                loader2.style.display = "none";
+                                hideLoadersClearTeamsAndDisplayErrorDiv(resp)
                                 errorField.innerText = `${resp.status.message}`;
                                 enableSumbmit();
                                 reject(resp.status.message);
